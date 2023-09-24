@@ -16,16 +16,22 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post('new')
-  create(
-    @Body('title') title: string,
-    @Body('description') description: string,
-  ): Task {
-    console.log(title, description);
-    return this.taskService.create(title, description);
+  create(@Body() taskDto: CreateTaskDto): Task {
+    return this.taskService.create(taskDto);
   }
 
   @Get()
   getAllTasks(): Task[] {
     return this.taskService.getAllTasks();
+  }
+
+  @Get('/:id')
+  getTaskById(@Param('id') id: string): Task {
+    return this.taskService.getTaskById(id);
+  }
+
+  @Delete('/:id')
+  deleteById(@Param('id') id: string) {
+    return this.taskService.deleteById(id);
   }
 }

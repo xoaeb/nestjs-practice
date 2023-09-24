@@ -1,4 +1,7 @@
-export class CreateTaskDto {}
+export class CreateTaskDto {
+  title: string;
+  description: string;
+}
 
 export interface Task {
   id: string;

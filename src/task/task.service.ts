@@ -6,11 +6,12 @@ import { v4 as uuid } from 'uuid';
 @Injectable()
 export class TaskService {
   private task: Task[] = [];
-  create(title: string, description: string) {
+  create(taskDto: CreateTaskDto) {
+    const { title, description } = taskDto;
     const task: any = {
       id: uuid(),
-      description: description,
-      title: title,
+      description,
+      title,
       status: STATUS.OPEN,
     };
     this.task.push(task);
@@ -19,5 +20,13 @@ export class TaskService {
 
   getAllTasks() {
     return this.task;
+  }
+
+  getTaskById(id: string) {
+    return this.task.find((task) => task.id === id);
+  }
+
+  deleteById(id: string) {
+    return (this.task = this.task.filter((task) => task.id !== id));
   }
 }
