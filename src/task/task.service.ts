@@ -3,10 +3,14 @@ import { CreateTaskDto, STATUS } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './dto/create-task.dto';
 import { v4 as uuid } from 'uuid';
+import { writeFile, readFile } from 'fs/promises';
 @Injectable()
 export class TaskService {
   private task: Task[] = [];
-  create(taskDto: CreateTaskDto) {
+  async create(taskDto: CreateTaskDto) {
+    const contents = await readFile('tasks.json', 'utf8');
+    const taskList = JSON.parse(contents);
+
     const { title, description } = taskDto;
     const task: any = {
       id: uuid(),
@@ -14,19 +18,38 @@ export class TaskService {
       title,
       status: STATUS.OPEN,
     };
-    this.task.push(task);
+    taskList.push(task);
+    await writeFile('tasks.json', JSON.stringify(taskList));
+
     return task;
   }
 
-  getAllTasks() {
-    return this.task;
+  async getAllTasks() {
+    const contents = await readFile('tasks.json', 'utf8');
+    const taskList = JSON.parse(contents);
+
+    return taskList;
   }
 
-  getTaskById(id: string) {
-    return this.task.find((task) => task.id === id);
+  async getTaskById(id: string) {
+    const contents = await readFile('tasks.json', 'utf8');
+    const taskList = JSON.parse(contents);
+
+    return taskList.find((task) => task.id === id);
   }
 
-  deleteById(id: string) {
-    return (this.task = this.task.filter((task) => task.id !== id));
+  async deleteById(id: string) {
+    const contents = await readFile('tasks.json', 'utf8');
+    let taskList = JSON.parse(contents);
+
+    taskList = taskList.filter((task) => task.id !== id);
+    await writeFile('tasks.json', JSON.stringify(taskList));
+    return taskList;
+  }
+
+  updateTaskById(id: string, status: STATUS) {
+    const myTask: any = this.getTaskById(id);
+    myTask.status = status;
+    return myTask;
   }
 }
