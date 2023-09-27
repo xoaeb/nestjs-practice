@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto, STATUS } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './dto/create-task.dto';
 import { v4 as uuid } from 'uuid';
 import { writeFile, readFile } from 'fs/promises';
+import { NotFoundError } from 'rxjs';
 @Injectable()
 export class TaskService {
   private task: Task[] = [];
@@ -35,7 +36,12 @@ export class TaskService {
     const contents = await readFile('tasks.json', 'utf8');
     const taskList = JSON.parse(contents);
 
-    return taskList.find((task) => task.id === id);
+    const found = taskList.find((task) => task.id === id);
+    if (!found) {
+      throw new NotFoundException();
+    } else {
+      return found;
+    }
   }
 
   async deleteById(id: string) {
